@@ -1,0 +1,29 @@
+{
+  "CO2 (kg/kg)": {
+    "best_model_type": "GradientBoosting",
+    "model_path": "outputs/model_co2.pkl",
+    "metrics": {
+      "r2": 0.9984,
+      "mae": 0.0191,
+      "rmse": 0.0252
+    }
+  },
+  "Energy (MJ/kg)": {
+    "best_model_type": "RandomForest",
+    "model_path": "outputs/model_energy.pkl",
+    "metrics": {
+      "r2": 1.0,
+      "mae": 0.0,
+      "rmse": 0.0
+    }
+  },
+  "Env_Score": {
+    "best_model_type": "GradientBoosting",
+    "model_path": "outputs/model_env_score.pkl",
+    "metrics": {
+      "r2": 0.9988,
+      "mae": 0.4264,
+      "rmse": 0.5599
+    }
+  }
+}
