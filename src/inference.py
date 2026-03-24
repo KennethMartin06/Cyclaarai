@@ -22,7 +22,7 @@ import joblib
 import numpy as np
 import pandas as pd
 
-FEATURES = [
+RAW_FEATURES = [
     "rPET_Content (%)",
     "Bio_PET_Content (%)",
     "IV (dL/g)",
@@ -30,8 +30,18 @@ FEATURES = [
     "Stretch_Ratio",
     "Energy_Source",
 ]
+ENGINEERED_FEATURES = [
+    "rPET_x_Energy",
+    "Total_Recycled (%)",
+]
+FEATURES = RAW_FEATURES + ENGINEERED_FEATURES
 TARGETS = ["CO2 (kg/kg)", "Energy (MJ/kg)", "Env_Score"]
 ENERGY_LABELS = {0: "Coal", 1: "Grid mix", 2: "Renewable"}
+TARGET_BOUNDS = {
+    "CO2 (kg/kg)":    (0, None),
+    "Energy (MJ/kg)": (0, None),
+    "Env_Score":       (0, 100),
+}
 MODEL_DIR = "outputs"
 
 
@@ -39,7 +49,7 @@ def load_models(model_dir: str = MODEL_DIR) -> dict:
     models = {}
     for t in TARGETS:
         fname = f"model_{t.split()[0].lower()}.pkl"
-        path  = os.path.join(model_dir, fname)
+        path = os.path.join(model_dir, fname)
         models[t] = joblib.load(path)
     return models
 
@@ -52,10 +62,20 @@ def predict_one(models, rPET, bioPET, iv, temp, stretch, energy_source):
         "Processing_Temp (°C)": temp,
         "Stretch_Ratio":        stretch,
         "Energy_Source":        energy_source,
+        "rPET_x_Energy":        rPET * energy_source,
+        "Total_Recycled (%)":   rPET + bioPET,
     }])[FEATURES]
-    return {t: round(float(models[t].predict(row)[0]),
-                     3 if t != "Env_Score" else 2)
-            for t in TARGETS}
+
+    out = {}
+    for t in TARGETS:
+        pred = float(models[t].predict(row)[0])
+        lo, hi = TARGET_BOUNDS.get(t, (None, None))
+        if lo is not None:
+            pred = max(pred, lo)
+        if hi is not None:
+            pred = min(pred, hi)
+        out[t] = round(pred, 3 if t != "Env_Score" else 2)
+    return out
 
 
 def cmd_predict(args, models):

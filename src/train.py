@@ -324,7 +324,7 @@ def save_metrics(results: dict, out_dir: str):
 # ── main ─────────────────────────────────────────────────────────────────────
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data",    default="C:\Users\kenne\OneDrive\Desktop\CyclaaraAI\data\raw\pet_bottle_10000.xlsx")
+    parser.add_argument("--data",    default="C:/Users/kenne/OneDrive/Desktop/CyclaaraAI/data/raw/pet_bottle_10000.xlsx")
     parser.add_argument("--out_dir", default="outputs")
     args = parser.parse_args()
 
